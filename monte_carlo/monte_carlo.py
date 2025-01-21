@@ -26,4 +26,6 @@ def geometric_brownian_motion(IS, ER, sigma, T, timesteps, simulations):
     #generate paths using the GBM formula
     for t in range(1, timesteps):
         paths[:, t] = paths[:, t-1] * np.exp((ER - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * random_factors[:, t-1])
+    print(paths)    
     return paths
+
