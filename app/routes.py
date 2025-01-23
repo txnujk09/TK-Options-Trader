@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from ..monte_carlo.option_pricing import price_option
+from monte_carlo.option_pricing import price_option
 
 routes = Blueprint('routes', __name__)
 
