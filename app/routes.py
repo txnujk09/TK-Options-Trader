@@ -26,3 +26,11 @@ def calculate_option_price():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@routes.route('/', methods=['get'])
+def homepage():
+    try:
+        return jsonify({"option_price": "Tanuj Kakumani"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
