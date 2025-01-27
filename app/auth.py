@@ -1,6 +1,6 @@
 # user authentication logic
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.models import db, User
+from models import db, User
 
 def register_user(username, password):
     hashed_password = generate_password_hash(password, method='sha256')
