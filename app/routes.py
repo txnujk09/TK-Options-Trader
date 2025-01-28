@@ -37,9 +37,10 @@ def homepage():
         return jsonify({"error": str(e)}), 500'''
 
 from flask import Blueprint, request, jsonify
-from app.models import db, User
-from app.auth import register_user, login_user
+from models import db, User
+from auth import register_user, login_user
 from monte_carlo.option_pricing import price_option
+from werkzeug.security import generate_password_hash, check_password_hash
 
 routes = Blueprint('routes', __name__)
 
@@ -71,25 +72,20 @@ def calculate_option_price():
 
 @routes.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    try:
-        username = data['username']
-        password = data['password']
-        register_user(username, password)
-        return jsonify({"message": "User registered successfully"}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    data = request.json
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+    new_user = User(username=data['username'], password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({'message': 'User registered successfully!'})
 
+# User login
 @routes.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    try:
-        username = data['username']
-        password = data['password']
-        if login_user(username, password):
-            return jsonify({"message": "Login successful"}), 200
-        return jsonify({"error": "Invalid credentials"}), 401
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    data = request.json
+    user = User.query.filter_by(username=data['username']).first()
+    if user and check_password_hash(user.password, data['password']):
+        return jsonify({'message': 'Login successful!'})
+    return jsonify({'message': 'Invalid credentials'}), 401
     
     
