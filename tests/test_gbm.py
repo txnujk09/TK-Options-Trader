@@ -1,4 +1,4 @@
-from monte_carlo.monte_carlo import geometric_brownian_motion
+from app.monte_carlo.monte_carlo import geometric_brownian_motion
 
 def test_gbm_output_shape():
     """
