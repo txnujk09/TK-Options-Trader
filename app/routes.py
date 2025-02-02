@@ -1,8 +1,9 @@
 from flask import Blueprint, request, jsonify
-from models import db, User
+from models import db, User, Order, Trade
 from auth import register_user, login_user
 from monte_carlo.option_pricing import price_option
 from werkzeug.security import generate_password_hash, check_password_hash
+from trading import match_orders
 
 routes = Blueprint('routes', __name__)
 
@@ -49,6 +50,30 @@ def login():
     if user and check_password_hash(user.password, data['password']):
         return jsonify({'message': 'Login successful!'})
     return jsonify({'message': 'Invalid credentials'}), 401
+
+
+#Flask API routes for placing orders and executing trades
+main = Blueprint("main", __name__)
+
+@main.route('/place_order', methods=['POST'])
+def place_order():
+    data = request.json
+    new_order = Order(
+        user_id=data["user_id"],
+        option_id=data["option_id"],
+        order_type=data["order_type"],
+        quantity=data["quantity"],
+        price=data["price"],
+        status="pending"
+    )
+    db.session.add(new_order)
+    db.session.commit()
+    return jsonify({"message": "Order placed successfully"}), 200
+
+@main.route('/match_orders', methods=['POST'])
+def run_order_matching():
+    trades = match_orders()
+    return jsonify({"message": f"{len(trades)} trades executed"}), 200
 
 
     

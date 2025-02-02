@@ -38,3 +38,19 @@ def test_against_black_scholes():
 
     # Validate the results (Monte Carlo should be close to Black-Scholes for high simulations)
     assert abs(monte_carlo_price - bs_price) / bs_price < 0.05  # Allow 5% deviation
+
+#testing edge cases
+def test_edge_cases():
+    from app.monte_carlo.option_pricing import price_option
+
+    # Extreme volatility
+    assert price_option(100, 0.05, 2.0, 1, 365, 10000, 110, 'call') > 0
+
+    # Long time to maturity
+    assert price_option(100, 0.05, 0.2, 10, 3650, 10000, 150, 'call') > 0
+
+    # Very high strike price
+    assert price_option(100, 0.05, 0.2, 1, 365, 10000, 1000, 'put') > 0
+
+import matplotlib.pyplot as plt
+from app.monte_carlo.visualise_gbm import geometric_brownian_motion
