@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 from models import db, User, Order, Trade
 from auth import register_user, login_user
 from monte_carlo.option_pricing import price_option
@@ -7,9 +7,9 @@ from trading import match_orders
 
 routes = Blueprint('routes', __name__)
 
-@routes.route('/')
-def home():
-    return jsonify({"message": "Welcome to the Options Trading API!"})
+# @routes.route('/')
+# def home():
+#     return jsonify({"message": "Welcome to the Options Trading API!"})
 
 @routes.route('/price_option', methods=['POST'])
 def calculate_option_price():
@@ -75,6 +75,25 @@ def run_order_matching():
     trades = match_orders()
     return jsonify({"message": f"{len(trades)} trades executed"}), 200
 
+@routes.route('/')
+def home():
+    return render_template('index.html')
 
+@routes.route('/trade', methods=['GET', 'POST'])
+def trade():
+    if request.method == 'POST':
+        # Handle trade execution logic here
+        return jsonify({'message': 'Trade executed successfully'})
+    return render_template('trade.html')
+
+@routes.route('/portfolio')
+def portfolio():
+    # Fetch portfolio data for display
+    return render_template('portfolio.html')
+
+@routes.route('/market-trends')
+def market_trends():
+    # Fetch market trends data for visualisation
+    return render_template('market_trends.html')
     
     

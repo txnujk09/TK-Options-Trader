@@ -1,9 +1,19 @@
-from app.myapp import create_app, db
-from app.models import Order, db
+import pytest
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../app')))
+#sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../app/monte_carlo')))
+
+print(sys.path)
+
+from app.myapp import create_app
+from app.models import db, Order
 
 def test_place_buy_order():
     app = create_app()
-    app.config.from_object('config.TestConfig')
+    #app.config.from_object('config.TestConfig')
 
     with app.app_context():
         # Simulate placing a buy order

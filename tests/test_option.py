@@ -1,4 +1,11 @@
 import pytest
+import sys
+import os
+# Add the root directory to sys.path
+# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../app')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../app/monte_carlo')))
+
 from app.monte_carlo.option_pricing import price_option
 
 def test_price_option_correctness():
@@ -52,5 +59,5 @@ def test_edge_cases():
     # Very high strike price
     assert price_option(100, 0.05, 0.2, 1, 365, 10000, 1000, 'put') > 0
 
-import matplotlib.pyplot as plt
-from app.monte_carlo.visualise_gbm import geometric_brownian_motion
+# import matplotlib.pyplot as plt
+# from app.monte_carlo.visualise_gbm import geometric_brownian_motion
