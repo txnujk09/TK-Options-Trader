@@ -31,8 +31,7 @@ def geometric_brownian_motion(IS, ER, sigma, T, timesteps, simulations):
   
     return paths
 
-
-def main():
+def run_gbm():
     # Parameters
     IS = 100
     ER = 0.05
@@ -48,7 +47,7 @@ def main():
     print("Simulated Stock Price Paths (First Simulation):")
     print(paths)
 
-def main_visual():
+def run_gbm_visual():
     # Parameters for GBM
     IS = 100  # Initial stock price
     ER = 0.05  # Expected return (drift)
@@ -71,4 +70,4 @@ def main_visual():
     plt.show()
 
 if __name__ == "__main__":
-    sys.exit(main_visual())
+    sys.exit(run_gbm_visual())

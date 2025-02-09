@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template
 from models import db, User, Order, Trade
 from auth import register_user, login_user
-from monte_carlo.option_pricing import price_option
+from app.monte_carlo.option_pricing import price_option
 from werkzeug.security import generate_password_hash, check_password_hash
 from trading import match_orders
 

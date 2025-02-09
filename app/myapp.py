@@ -2,6 +2,7 @@ from flask import Flask, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from models import db
+from routes import routes
 
 #db = SQLAlchemy()
 migrate = Migrate()
@@ -16,11 +17,10 @@ def create_app():
 
     #creating database tables
     with app.app_context():
-     print("Current app:", current_app.name)
-     db.create_all()
+        print("Current app:", current_app.name)
+        db.create_all()
 
     # Register Blueprints
-    from app.routes import routes
     app.register_blueprint(routes)
 
     return app
