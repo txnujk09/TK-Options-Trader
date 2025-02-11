@@ -1,15 +1,13 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
 from models import db, User, Order, Trade
 from auth import register_user, login_user
 from app.monte_carlo.option_pricing import price_option
 from werkzeug.security import generate_password_hash, check_password_hash
 from trading import match_orders
+from forms_1 import RegistrationForm, LoginForm
+from flask_login import login_user, logout_user, login_required, current_user
 
 routes = Blueprint('routes', __name__)
-
-# @routes.route('/')
-# def home():
-#     return jsonify({"message": "Welcome to the Options Trading API!"})
 
 @routes.route('/price_option', methods=['POST'])
 def calculate_option_price():
@@ -43,14 +41,30 @@ def register():
     return jsonify({'message': 'User registered successfully!'})
 
 # User login
-@routes.route('/login', methods=['POST'])
-def login():
-    data = request.json
-    user = User.query.filter_by(username=data['username']).first()
-    if user and check_password_hash(user.password, data['password']):
-        return jsonify({'message': 'Login successful!'})
-    return jsonify({'message': 'Invalid credentials'}), 401
+#@routes.route('/login', methods=['POST'])
+#def login():
+#    data = request.json
+#    user = User.query.filter_by(username=data['username']).first()
+#    if user and check_password_hash(user.password, data['password']):
+#       return jsonify({'message': 'Login successful!'})
+#    return jsonify({'message': 'Invalid credentials'}), 401
 
+@routes.route('/login', methods=['GET', 'POST'])
+def login():
+    # if current_user.is_authenticated:
+    #     return redirect(url_for('home'))
+    
+    form = LoginForm()
+    # if form.validate_on_submit():
+    #     user = User.query.filter_by(email=form.email.data).first()
+    #     if user and user.check_password(form.password.data):
+    #         login_user(user)
+    #         flash('Login successful!', 'success')
+    #         return redirect(url_for('dashboard'))
+    #     else:
+    #         flash('Invalid email or password', 'danger')
+
+    return render_template('login.html', form=form)
 
 #Flask API routes for placing orders and executing trades
 main = Blueprint("main", __name__)
