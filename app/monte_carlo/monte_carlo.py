@@ -1,9 +1,9 @@
-import sys
-import numpy as np
-import matplotlib.pyplot as plt
+import sys #imports the sys module
+import numpy as np #imports the numpy library
+import matplotlib.pyplot as plt #imports the pyplot module from matplotlib
 
 #Simulates stock price paths using the Geometric Brownian Motion
-def geometric_brownian_motion(IS, ER, sigma, T, timesteps, simulations):
+def geometric_brownian_motion(IS, ER, sigma, T, timesteps, simulations): #defines the function
     """
     Parameters:
      IS (float): Intial stock price
@@ -26,12 +26,12 @@ def geometric_brownian_motion(IS, ER, sigma, T, timesteps, simulations):
     paths[:, 0] = IS
 
     #generate paths using the GBM formula
-    for t in range(1, timesteps):
-        paths[:, t] = paths[:, t-1] * np.exp((ER - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * random_factors[:, t-1])
+    for t in range(1, timesteps): #starts at t=1 and runs until t=timesteps-1
+        paths[:, t] = paths[:, t-1] * np.exp((ER - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * random_factors[:, t-1]) #discretised form of the geometric brownian motion
   
     return paths
 
-def run_gbm():
+def run_gbm(): #defines the run_gbm function
     # Parameters
     IS = 100
     ER = 0.05
@@ -40,14 +40,14 @@ def run_gbm():
     timesteps = 100
     simulations = 10
 
-    # Run GBM simulation
-    paths = geometric_brownian_motion(IS, ER, sigma, T, timesteps, simulations)
+    #calls the geometric_brownian_motion function and stores the generated stock price simulations in variable paths
+    paths = geometric_brownian_motion(IS, ER, sigma, T, timesteps, simulations) 
 
     # Print the first simulation
     print("Simulated Stock Price Paths (First Simulation):")
     print(paths)
 
-def run_gbm_visual():
+def run_gbm_visual(): #defines the run_gbm_visual function
     # Parameters for GBM
     IS = 100  # Initial stock price
     ER = 0.05  # Expected return (drift)
@@ -60,14 +60,16 @@ def run_gbm_visual():
     paths = geometric_brownian_motion(IS, ER, sigma, T, timesteps, simulations)
 
     # Plot the simulated paths
-    plt.figure(figsize=(10, 6))
-    for path in paths:
-        plt.plot(path)
-    plt.title("Simulated Stock Price Paths (Geometric Brownian Motion)")
-    plt.xlabel("Time Steps")
-    plt.ylabel("Stock Price")
-    plt.grid()
-    plt.show()
+    plt.figure(figsize=(10, 6)) #creates new figure with size of (10,6) inches
+    for path in paths: #loops through each simulated stock price path stored in paths 
+        plt.plot(path) #plot each path as a separate line on graph
+    plt.title("Simulated Stock Price Paths (Geometric Brownian Motion)") #adds a title for clarity
+    plt.xlabel("Time Steps") #x label for clarity
+    plt.ylabel("Stock Price") #y label for clarity
+    plt.grid() #enables the grid to make it easier to analyse trends
+    plt.show() #displays to plot
 
+#ensures the script runs only when executed directly
 if __name__ == "__main__":
-    sys.exit(run_gbm_visual())
+    sys.exit(run_gbm_visual()) #calls the run_gbm_visual function which generates and visualises GBM simulations
+#sys.exit() ensures clean program termination after execution
