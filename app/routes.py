@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from trading import match_orders
 from forms_1 import RegistrationForm, LoginForm
 from flask_login import login_user, logout_user, login_required, current_user
+from app.monte_carlo.monte_carlo import monte_carlo_greeks
 
 routes = Blueprint('routes', __name__)
 
@@ -109,5 +110,21 @@ def portfolio():
 def market_trends():
     # Fetch market trends data for visualisation
     return render_template('market_trends.html')
+
+#provides an API for users to compute Greeks
+@routes.route('/calculate_mc_greeks', methods=['POST'])
+def calculate_mc_greeks():
+
+    data = request.json
+    S = float(data['S'])  # Stock price
+    K = float(data['K'])  # Strike price
+    T = float(data['T'])  # Time to expiry in years
+    r = float(data['r'])  # Risk-free rate
+    sigma = float(data['sigma'])  # Volatility
+    option_type = data['option_type']  # "call" or "put"
+
+    greeks = monte_carlo_greeks(S, K, T, r, sigma, option_type)
+
+    return render_template('mc_greeks.html', greeks=greeks)
     
     

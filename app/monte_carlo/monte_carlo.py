@@ -73,3 +73,37 @@ def run_gbm_visual(): #defines the run_gbm_visual function
 if __name__ == "__main__":
     sys.exit(run_gbm_visual()) #calls the run_gbm_visual function which generates and visualises GBM simulations
 #sys.exit() ensures clean program termination after execution
+
+#option greeks function
+def monte_carlo_greeks(S, K, T, r, sigma, option_type="call", num_simulations=10000, epsilon=0.01):
+    from option_pricing import price_option
+    """
+    Computes the Greeks using Monte Carlo simulation.
+
+    Returns:
+    Delta, Gamma, Theta, Vega, Rho
+    """
+    # Baseline option price
+    base_price = price_option(S, K, T, r, sigma, option_type, num_simulations)
+
+    # Delta: Change in option price w.r.t stock price (∂V/∂S)
+    delta_price_up = price_option(S + epsilon, K, T, r, sigma, option_type, num_simulations)
+    delta_price_down = price_option(S - epsilon, K, T, r, sigma, option_type, num_simulations)
+    delta = (delta_price_up - delta_price_down) / (2 * epsilon)
+
+    # Gamma: Change in Delta w.r.t stock price (∂²V/∂S²)
+    gamma = (delta_price_up - 2 * base_price + delta_price_down) / (epsilon ** 2)
+
+    # Theta: Change in option price w.r.t time (∂V/∂T)
+    theta_price = price_option(S, K, T - epsilon, r, sigma, option_type, num_simulations)
+    theta = (theta_price - base_price) / epsilon  # Convert to per-day decay
+
+    # Vega: Change in option price w.r.t volatility (∂V/∂σ)
+    vega_price = price_option(S, K, T, r, sigma + epsilon, option_type, num_simulations)
+    vega = (vega_price - base_price) / epsilon  # Convert to percentage
+
+    # Rho: Change in option price w.r.t interest rates (∂V/∂r)
+    rho_price = price_option(S, K, T, r + epsilon, sigma, option_type, num_simulations)
+    rho = (rho_price - base_price) / epsilon  # Convert to percentage
+
+    return {"Delta": delta, "Gamma": gamma, "Theta": theta, "Vega": vega, "Rho": rho}
