@@ -2,11 +2,12 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin #imports the 'UserMixin' class from Flask-Login
 
 db = SQLAlchemy()
 
 # User Table
-class User(db.Model):
+class User(UserMixin, db.Model): #defines a user model with authentication support and database integration
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     hashed_password = db.Column(db.String(256), nullable=False)
@@ -14,10 +15,8 @@ class User(db.Model):
     balance = db.Column(db.Float, default=10000)  # Starting virtual balance
 
     def set_password(self, password):
-        #self.hashed_password = password
         self.hashed_password = generate_password_hash(password)
     def check_password(self, password):
-        #return self.hashed_password==password
         return check_password_hash(self.hashed_password, password)
     def set_email(self, email):
         self.email = email

@@ -1,5 +1,5 @@
-import numpy as np
-from monte_carlo import geometric_brownian_motion
+import numpy as np #imports the numpy library and assigns it the alias 'np'
+from monte_carlo import geometric_brownian_motion #imports 'geometric_brownian_motion' from the module 'monte_carlo'
 
 def price_option(IS, ER, sigma, T, timesteps, simulations, K, option_type="call"):
     """

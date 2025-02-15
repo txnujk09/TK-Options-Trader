@@ -75,35 +75,113 @@ if __name__ == "__main__":
 #sys.exit() ensures clean program termination after execution
 
 #option greeks function
-def monte_carlo_greeks(S, K, T, r, sigma, option_type="call", num_simulations=10000, epsilon=0.01):
-    from option_pricing import price_option
+# def monte_carlo_greeks(S, K, T, r, sigma, option_type="call", num_simulations=10000, epsilon=0.01):
+#     from option_pricing import price_option
+#     """
+#     Computes the Greeks using Monte Carlo simulation.
+
+#     Returns:
+#     Delta, Gamma, Theta, Vega, Rho
+#     """
+#     base_price = price_option(
+#         IS=S,
+#         ER=r,
+#         sigma=sigma,
+#         T=T,
+#         timesteps=timesteps,  # Ensure this is defined
+#         simulations=num_simulations,
+#         K=K,
+#         option_type=option_type
+#         )
+#     # Baseline option price
+#     base_price = price_option(S, K, T, r, sigma, option_type, num_simulations)
+
+#     # Delta: Change in option price w.r.t stock price (∂V/∂S)
+#     delta_price_up = price_option(S + epsilon, K, T, r, sigma, option_type, num_simulations)
+#     delta_price_down = price_option(S - epsilon, K, T, r, sigma, option_type, num_simulations)
+#     delta = (delta_price_up - delta_price_down) / (2 * epsilon)
+
+#     # Gamma: Change in Delta w.r.t stock price (∂²V/∂S²)
+#     gamma = (delta_price_up - 2 * base_price + delta_price_down) / (epsilon ** 2)
+
+#     # Theta: Change in option price w.r.t time (∂V/∂T)
+#     theta_price = price_option(S, K, T - epsilon, r, sigma, option_type, num_simulations)
+#     theta = (theta_price - base_price) / epsilon  # Convert to per-day decay
+
+#     # Vega: Change in option price w.r.t volatility (∂V/∂σ)
+#     vega_price = price_option(S, K, T, r, sigma + epsilon, option_type, num_simulations)
+#     vega = (vega_price - base_price) / epsilon  # Convert to percentage
+
+#     # Rho: Change in option price w.r.t interest rates (∂V/∂r)
+#     rho_price = price_option(S, K, T, r + epsilon, sigma, option_type, num_simulations)
+#     rho = (rho_price - base_price) / epsilon  # Convert to percentage
+
+#     return {"Delta": delta, "Gamma": gamma, "Theta": theta, "Vega": vega, "Rho": rho}
+
+import numpy as np
+
+def monte_carlo_greeks(S, K, T, r, sigma, option_type, num_simulations=10000, epsilon=1e-4):
     """
-    Computes the Greeks using Monte Carlo simulation.
+    Computes option Greeks using the Monte Carlo method.
+
+    Parameters:
+    S (float)          : Current stock price
+    K (float)          : Strike price
+    T (float)          : Time to maturity (years)
+    r (float)          : Risk-free interest rate
+    sigma (float)      : Volatility of the underlying asset
+    option_type (str)  : "call" or "put"
+    num_simulations (int): Number of Monte Carlo simulations
+    epsilon (float)    : Small perturbation for numerical differentiation
 
     Returns:
-    Delta, Gamma, Theta, Vega, Rho
+    dict: Contains Delta, Gamma, Vega, Theta, and Rho
     """
-    # Baseline option price
-    base_price = price_option(S, K, T, r, sigma, option_type, num_simulations)
 
-    # Delta: Change in option price w.r.t stock price (∂V/∂S)
-    delta_price_up = price_option(S + epsilon, K, T, r, sigma, option_type, num_simulations)
-    delta_price_down = price_option(S - epsilon, K, T, r, sigma, option_type, num_simulations)
+    def monte_carlo_price(S, K, T, r, sigma, option_type):
+        """Computes the option price using Monte Carlo simulation."""
+        Z = np.random.standard_normal(num_simulations)
+        S_T = S * np.exp((r - 0.5 * sigma**2) * T + sigma * np.sqrt(T) * Z)
+        if option_type == "call":
+            payoffs = np.maximum(S_T - K, 0)
+        else:
+            payoffs = np.maximum(K - S_T, 0)
+        return np.exp(-r * T) * np.mean(payoffs)
+
+    # Base option price
+    base_price = monte_carlo_price(S, K, T, r, sigma, option_type)
+
+    # Delta (∂C/∂S): Sensitivity to stock price
+    delta_price_up = monte_carlo_price(S + epsilon, K, T, r, sigma, option_type)
+    delta_price_down = monte_carlo_price(S - epsilon, K, T, r, sigma, option_type)
     delta = (delta_price_up - delta_price_down) / (2 * epsilon)
 
-    # Gamma: Change in Delta w.r.t stock price (∂²V/∂S²)
+    # Gamma (∂²C/∂S²): Sensitivity of Delta
     gamma = (delta_price_up - 2 * base_price + delta_price_down) / (epsilon ** 2)
 
-    # Theta: Change in option price w.r.t time (∂V/∂T)
-    theta_price = price_option(S, K, T - epsilon, r, sigma, option_type, num_simulations)
-    theta = (theta_price - base_price) / epsilon  # Convert to per-day decay
+    # Vega (∂C/∂σ): Sensitivity to volatility
+    vega_price_up = monte_carlo_price(S, K, T, r, sigma + epsilon, option_type)
+    vega_price_down = monte_carlo_price(S, K, T, r, sigma - epsilon, option_type)
+    vega = (vega_price_up - vega_price_down) / (2 * epsilon)
 
-    # Vega: Change in option price w.r.t volatility (∂V/∂σ)
-    vega_price = price_option(S, K, T, r, sigma + epsilon, option_type, num_simulations)
-    vega = (vega_price - base_price) / epsilon  # Convert to percentage
+    # Theta (∂C/∂T): Sensitivity to time
+    theta_price_up = monte_carlo_price(S, K, T + epsilon, r, sigma, option_type)
+    theta_price_down = monte_carlo_price(S, K, T - epsilon, r, sigma, option_type)
+    theta = (theta_price_down - theta_price_up) / (2 * epsilon)
 
-    # Rho: Change in option price w.r.t interest rates (∂V/∂r)
-    rho_price = price_option(S, K, T, r + epsilon, sigma, option_type, num_simulations)
-    rho = (rho_price - base_price) / epsilon  # Convert to percentage
+    # Rho (∂C/∂r): Sensitivity to interest rate
+    rho_price_up = monte_carlo_price(S, K, T, r + epsilon, sigma, option_type)
+    rho_price_down = monte_carlo_price(S, K, T, r - epsilon, sigma, option_type)
+    rho = (rho_price_up - rho_price_down) / (2 * epsilon)
 
-    return {"Delta": delta, "Gamma": gamma, "Theta": theta, "Vega": vega, "Rho": rho}
+    return {
+        "Delta": delta,
+        "Gamma": gamma,
+        "Vega": vega,
+        "Theta": theta,
+        "Rho": rho
+    }
+
+# Example usage with dummy values
+greeks = monte_carlo_greeks(S=100, K=105, T=1, r=0.05, sigma=0.2, option_type="call")
+print(greeks)

@@ -57,20 +57,40 @@ def register():
 
 @routes.route('/login', methods=['GET', 'POST'])
 def login():
-    # if current_user.is_authenticated:
-    #     return redirect(url_for('home'))
-    
+    print("Login route")
+    if current_user.is_authenticated:
+        print("Current user authenticated")
+        return redirect(url_for('routes.home'))
     form = LoginForm()
-    # if form.validate_on_submit():
-    #     user = User.query.filter_by(email=form.email.data).first()
-    #     if user and user.check_password(form.password.data):
-    #         login_user(user)
-    #         flash('Login successful!', 'success')
-    #         return redirect(url_for('dashboard'))
-    #     else:
-    #         flash('Invalid email or password', 'danger')
+    if form.validate_on_submit():
+        print("Login validation successful")
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            flash('Login successful!', 'success')
+            return redirect(url_for('routes.home'))
+        else:
+            flash('Invalid email or password', 'danger')
 
-    return render_template('login.html', form=form)
+    print("Login route - End")
+    return render_template('login.html', form=form, register=routes.register)
+
+# @routes.route('/login', methods=['GET', 'POST'])
+# def login():
+#     # if current_user.is_authenticated:
+#     #     return redirect(url_for('home'))
+    
+#     form = LoginForm()
+#     if form.validate_on_submit():
+#         user = User.query.filter_by(email=form.email.data).first()
+#         if user and user.check_password(form.password.data):
+#             login_user(user)
+#             flash('Login successful!', 'success')
+#             return redirect(url_for('dashboard'))
+#         else:
+#             flash('Invalid email or password', 'danger')
+
+#     return render_template('login.html', form=form)
 
 #Flask API routes for placing orders and executing trades
 main = Blueprint("main", __name__)
@@ -97,7 +117,11 @@ def run_order_matching():
 
 @routes.route('/')
 def home():
-    return render_template('index.html')
+    if current_user.is_authenticated:
+        print("Current user authenticated")
+        return render_template('index.html')
+    
+    return redirect(url_for('routes.login'))
 
 @routes.route('/trade', methods=['GET', 'POST'])
 def trade():
@@ -117,18 +141,18 @@ def market_trends():
     return render_template('market_trends.html')
 
 #provides an API for users to compute Greeks
-@routes.route('/calculate_mc_greeks', methods=['POST'])
+@routes.route('/mc_greeks', methods=['GET', 'POST'])
 def calculate_mc_greeks():
 
-    data = request.json
-    S = float(data['S'])  # Stock price
-    K = float(data['K'])  # Strike price
-    T = float(data['T'])  # Time to expiry in years
-    r = float(data['r'])  # Risk-free rate
-    sigma = float(data['sigma'])  # Volatility
-    option_type = data['option_type']  # "call" or "put"
+    # data = request.json
+    # S = float(data['S'])  # Stock price
+    # K = float(data['K'])  # Strike price
+    # T = float(data['T'])  # Time to expiry in years
+    # r = float(data['r'])  # Risk-free rate
+    # sigma = float(data['sigma'])  # Volatility
+    # option_type = data['option_type']  # "call" or "put"
 
-    greeks = monte_carlo_greeks(S, K, T, r, sigma, option_type)
+    greeks = monte_carlo_greeks(S=100, K=105, T=1, r=0.05, sigma=0.2, option_type="call")
 
     return render_template('mc_greeks.html', greeks=greeks)
     
