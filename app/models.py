@@ -10,13 +10,17 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     hashed_password = db.Column(db.String(256), nullable=False)
+    email = db.Column(db.String(256), nullable=False)
     balance = db.Column(db.Float, default=10000)  # Starting virtual balance
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
+        #self.hashed_password = password
+        self.hashed_password = generate_password_hash(password)
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        #return self.hashed_password==password
+        return check_password_hash(self.hashed_password, password)
+    def set_email(self, email):
+        self.email = email
 
 # Options Table
 class Option(db.Model):

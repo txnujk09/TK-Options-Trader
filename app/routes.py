@@ -32,14 +32,19 @@ def calculate_option_price():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@routes.route('/register', methods=['POST'])
+@routes.route('/register', methods=['GET','POST'])
 def register():
-    data = request.json
-    hashed_password = generate_password_hash(data['password'], method='sha256')
-    new_user = User(username=data['username'], password=hashed_password)
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({'message': 'User registered successfully!'})
+    form= RegistrationForm()
+    if form.validate_on_submit():
+        new_user=User(username=form.username.data)
+        new_user.set_password(form.password.data)
+        new_user.set_email(form.email.data)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Registration successful! You can now start hustling', 'success')
+        return redirect(url_for('routes.login'))
+    return render_template('register.html', form=form)
+
 
 # User login
 #@routes.route('/login', methods=['POST'])
