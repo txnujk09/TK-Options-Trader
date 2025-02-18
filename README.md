@@ -1,7 +1,7 @@
 # TK Options Trading Platform
 A high-performance options trading platform, which uses the Monte Carlo simulation to price options. 
 
-🔹 Overview
+Overview
 This project is a fully functional options trading simulation platform, designed for:
 
 - Simulating option pricing using Monte Carlo simulations 📊
