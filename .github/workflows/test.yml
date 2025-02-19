@@ -1,18 +1,18 @@
-name: Python Tests
+name: Python Tests #name of the workflow
 
-on: [push, pull_request]
+on: [push, pull_request] #run this workflow on every push and pull request
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
+  test: #defines a job named "test"
+    runs-on: ubuntu-latest #use the latest Ubuntu virtual machine for testing
+    steps: #steps to execute in the job
+    - uses: actions/checkout@v3 #check out the repository code from Git
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v3 #installs the required Python version
       with:
-        python-version: '3.10'
+        python-version: '3.10' #specifies Python 3.10 as the version to use
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
     - name: Run tests
-      run: pytest
+      run: pytest #run all test cases in the "tests/" folder using pytest
