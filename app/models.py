@@ -34,26 +34,29 @@ class Option(db.Model):
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    option_id = db.Column(db.Integer, db.ForeignKey('option.id'), nullable=False)
+    stock_name = db.Column(db.String, nullable=False)
+    option_type = db.Column(db.String(4), nullable=False) # 'call' or 'put'
     order_type = db.Column(db.String(4), nullable=False)  # 'buy' or 'sell'
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(10), default='pending')  # 'pending' or 'executed'
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.now())
 
 # Trades Table
 class Trade(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     buyer_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    option_id = db.Column(db.Integer, db.ForeignKey('option.id'))
+    stock_name = db.Column(db.String, nullable=False)
+    option_type = db.Column(db.String(4), nullable=False) # 'call' or 'put'
     price = db.Column(db.Float, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.now())
 
 # Portfolio Table
 class Portfolio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    option_id = db.Column(db.Integer, db.ForeignKey('option.id'), nullable=False)
+    stock_name = db.Column(db.String, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
+    value=db.Column(db.Float, nullable=False)

@@ -11,3 +11,11 @@ flask-login==0.6.3
 flask-wtf==1.2.2 
 wtforms==3.2.1
 email-validator==2.2.0
+yfinance==0.2.54
+bidict==0.23.1
+flask-socketio==5.5.1
+h11==0.14.0
+python-engineio==4.11.2
+python-socketio==5.12.1
+simple-websocket==1.1.0
+wsproto==1.2.0

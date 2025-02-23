@@ -54,7 +54,7 @@
                 option_type: document.getElementById("option-type").value
             };
 
-            fetch('/mc_greeks', {
+            fetch('/mc_greeks_calc', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)

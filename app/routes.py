@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
-from models import db, User, Order, Trade
+from models import db, User, Order, Trade, Portfolio
 from auth import register_user, login_user
 from app.monte_carlo.option_pricing import price_option
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,7 +7,11 @@ from trading import match_orders
 from forms_1 import RegistrationForm, LoginForm
 from flask_login import login_user, logout_user, login_required, current_user
 from app.monte_carlo.monte_carlo import monte_carlo_greeks
+import yfinance as yf
+from datetime import datetime
+from sqlalchemy import or_
 
+# Create a Blueprint for modularity
 routes = Blueprint('routes', __name__)
 
 @routes.route('/price_option', methods=['POST'])
@@ -39,21 +43,12 @@ def register():
         new_user=User(username=form.username.data)
         new_user.set_password(form.password.data)
         new_user.set_email(form.email.data)
+        new_user.balance=10000
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful! You can now start hustling', 'success')
         return redirect(url_for('routes.login'))
     return render_template('register.html', form=form)
-
-
-# User login
-#@routes.route('/login', methods=['POST'])
-#def login():
-#    data = request.json
-#    user = User.query.filter_by(username=data['username']).first()
-#    if user and check_password_hash(user.password, data['password']):
-#       return jsonify({'message': 'Login successful!'})
-#    return jsonify({'message': 'Invalid credentials'}), 401
 
 @routes.route('/login', methods=['GET', 'POST'])
 def login():
@@ -75,42 +70,31 @@ def login():
     print("Login route - End")
     return render_template('login.html', form=form, register=routes.register)
 
-# @routes.route('/login', methods=['GET', 'POST'])
-# def login():
-#     # if current_user.is_authenticated:
-#     #     return redirect(url_for('home'))
-    
-#     form = LoginForm()
-#     if form.validate_on_submit():
-#         user = User.query.filter_by(email=form.email.data).first()
-#         if user and user.check_password(form.password.data):
-#             login_user(user)
-#             flash('Login successful!', 'success')
-#             return redirect(url_for('dashboard'))
-#         else:
-#             flash('Invalid email or password', 'danger')
-
-#     return render_template('login.html', form=form)
-
-#Flask API routes for placing orders and executing trades
-main = Blueprint("main", __name__)
-
-@main.route('/place_order', methods=['POST'])
+@routes.route('/place_order', methods=['POST'])
 def place_order():
-    data = request.json
-    new_order = Order(
-        user_id=data["user_id"],
-        option_id=data["option_id"],
-        order_type=data["order_type"],
-        quantity=data["quantity"],
-        price=data["price"],
-        status="pending"
-    )
-    db.session.add(new_order)
-    db.session.commit()
-    return jsonify({"message": "Order placed successfully"}), 200
+    if not current_user.is_authenticated:
+        print("Current user not authenticated")
+        # User not authenticated, redirect to login
+        return redirect(url_for('routes.login'))
+    
+    # Get order data
+    order_data = request.get_json()
+    print("Hello Tanuj-------------", order_data, current_user.id, current_user.username, current_user.email)
 
-@main.route('/match_orders', methods=['POST'])
+    order = Order()
+    order.user_id = current_user.id
+    order.option_type = "Call" if order_data['Type'] == "Call" else "Put"
+    order.order_type = "BUY" if order_data['Trade_type'] == "BUY" else "SELL"
+    order.price = order_data['Ask']
+    order.quantity = order_data['Volume']
+    order.stock_name = order_data['StockSymbol']
+    order.timestamp = datetime.now()
+    db.session.add(order)
+    db.session.commit()
+    match_orders()
+    return jsonify({"success":200}), 200
+
+@routes.route('/match_orders', methods=['POST'])
 def run_order_matching():
     trades = match_orders()
     return jsonify({"message": f"{len(trades)} trades executed"}), 200
@@ -130,11 +114,27 @@ def trade():
         return jsonify({'message': 'Trade executed successfully'})
     return render_template('trade.html')
 
+
 @routes.route('/portfolio')
 def portfolio():
-    # Fetch portfolio data for display
-    return render_template('portfolio.html')
+    if not current_user.is_authenticated:
+        print("Current user not authenticated")
+        # User not authenticated, redirect to login
+        return redirect(url_for('routes.login'))
 
+    user = User.query.filter_by(id=current_user.id).first()
+    available_funds = user.balance
+
+    # Fetch portfolio data for user id
+    options = Portfolio.query.filter_by(user_id=current_user.id).all()
+    print("Portfolio")
+    if options:
+        for option in options:
+            print(option.stock_name, option.value)
+            return render_template('portfolio.html', stocks=options, available_funds=available_funds)
+    else:
+        return render_template('portfolio.html', available_funds=available_funds)
+    
 @routes.route('/market-trends')
 def market_trends():
     # Fetch market trends data for visualisation
@@ -143,17 +143,72 @@ def market_trends():
 #provides an API for users to compute Greeks
 @routes.route('/mc_greeks', methods=['GET', 'POST'])
 def calculate_mc_greeks():
+    return render_template('mc_greeks.html')
 
-    # data = request.json
-    # S = float(data['S'])  # Stock price
-    # K = float(data['K'])  # Strike price
-    # T = float(data['T'])  # Time to expiry in years
-    # r = float(data['r'])  # Risk-free rate
-    # sigma = float(data['sigma'])  # Volatility
-    # option_type = data['option_type']  # "call" or "put"
-
-    greeks = monte_carlo_greeks(S=100, K=105, T=1, r=0.05, sigma=0.2, option_type="call")
-
-    return render_template('mc_greeks.html', greeks=greeks)
     
-    
+#provides an API for users to compute Greeks
+@routes.route('/mc_greeks_calc', methods=['GET', 'POST'])
+def calculate_mc_greeks_calc():
+
+    data = request.json
+    S = float(data['S'])  # Stock price
+    K = float(data['K'])  # Strike price
+    T = float(data['T'])  # Time to expiry in years
+    r = float(data['r'])  # Risk-free rate
+    sigma = float(data['sigma'])  # Volatility
+    option_type = data['option_type']  # "call" or "put"
+
+    greeks = monte_carlo_greeks(S=S, K=K, T=T, r=r, sigma=sigma, option_type=option_type)
+
+    greeks=jsonify({
+            "greeks": greeks, 
+            })
+    return greeks
+
+@routes.route('/options', methods=['GET', 'POST'])
+def get_options():
+    print("get_options")
+    symbol = request.args.get('symbol', 'AAPL')  # Default to AAPL if no symbol provided
+    try:
+        stock = yf.Ticker(symbol)
+        expirations = stock.options  # Get available expiration dates
+        options_chain = {}
+
+        for exp in expirations[:2]:  # Fetch only the first two expiration dates for efficiency
+            calls = stock.option_chain(exp).calls.fillna(0)
+            puts = stock.option_chain(exp).puts.fillna(0)
+            options_chain[exp] = {
+                "calls": calls.to_dict(orient="records"),
+                "puts": puts.to_dict(orient="records")
+            }
+            
+        return jsonify({
+            "symbol": symbol,
+            "expirations": expirations,
+            "options_chain": options_chain
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@routes.route('/order_history', methods=['GET', 'POST'])
+def order_history():
+    if not current_user.is_authenticated:
+        # User not authenticated, check what is best to return??
+        return 'OK'
+
+    orders = Order.query.filter(Order.user_id==current_user.id).all()
+
+    return render_template('order_history.html', orders=orders)
+
+@routes.route('/trade_history', methods=['GET', 'POST'])
+def trade_history():
+    if not current_user.is_authenticated:
+        # User not authenticated, check what is best to return??
+        return 'OK'
+
+    trades = Trade.query.filter(or_(Trade.buyer_id==current_user.id,Trade.seller_id==current_user.id)).all()
+    for trade in trades:
+        trade.order_type = "BUY" if trade.buyer_id == current_user.id else "SELL"
+        trade.value = trade.quantity * trade.price
+
+    return render_template('trade_history.html', trades=trades)
