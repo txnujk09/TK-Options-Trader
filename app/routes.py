@@ -1,40 +1,53 @@
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
-from models import db, User, Order, Trade, Portfolio
-from auth import register_user, login_user
-from app.monte_carlo.option_pricing import price_option
-from werkzeug.security import generate_password_hash, check_password_hash
-from trading import match_orders
-from forms_1 import RegistrationForm, LoginForm
-from flask_login import login_user, logout_user, login_required, current_user
-from app.monte_carlo.monte_carlo import monte_carlo_greeks
-import yfinance as yf
-from datetime import datetime
-from sqlalchemy import or_
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash #import Flask modules for web app functionality 
+from models import db, User, Order, Trade, Portfolio #import database models 
+from auth import register_user, login_user #import authentication functions
+from app.monte_carlo.option_pricing import price_option #import option pricing function
+from werkzeug.security import generate_password_hash, check_password_hash #import security functions
+from trading import match_orders #import trading logic for order matching
+from forms_1 import RegistrationForm, LoginForm #import form handling for user registration and login
+from flask_login import login_user, logout_user, login_required, current_user #import flask_login for user sessions management
+from app.monte_carlo.monte_carlo import monte_carlo_greeks 
+import yfinance as yf #import Yahoo Finance API for retrieving financial data
+from datetime import datetime #import datetime for handling time-based operations
+from sqlalchemy import or_ #import SQLAlchemy ORM for database operations
 
-# Create a Blueprint for modularity
-routes = Blueprint('routes', __name__)
+#----- Create a Blueprint for modularity -----
+routes = Blueprint('routes', __name__) #allows structuring the app into reusuable components
 
-@routes.route('/price_option', methods=['POST'])
+#----- API Route definition for Option Pricing -----
+@routes.route('/option_pricing', methods=['GET', 'POST']) #define a GET/POST API endpoint
 def calculate_option_price():
-    data = request.get_json()
     try:
-        IS = data.get('IS')
-        ER = data.get('ER')
-        sigma = data.get('sigma')
-        T = data.get('T')
-        timesteps = data.get('timesteps')
-        simulations = data.get('simulations')
-        K = data.get('K')
-        option_type = data.get('option_type')
+        return render_template('option_pricing.html')
+    except Exception as e: #handle any unexpected errors and return an error message with status 500 (Internal Server Error)
+        return jsonify({"error": str(e)}, 500)
 
-        if not all([IS, ER, sigma, T, timesteps, simulations, K, option_type]):
-            return jsonify({"error": "Missing required parameters"}), 400
 
-        price = price_option(IS, ER, sigma, T, timesteps, simulations, K, option_type)
-        return jsonify({"option_price": price}), 200
+#provides an API for users to compute Greeks
+@routes.route('/option_price_calculate', methods=['GET', 'POST'])
+def option_price_calculate():
+    data = request.json
+    print(data)
+    IS = data.get('IS') #initial stock price
+    ER = data.get('ER') #expected return
+    sigma = data.get('sigma') #volatility of stock
+    T = data.get('T') #time to maturity (in years)
+    timesteps = data.get('timesteps') #no. of timesteps in simulation
+    simulations = data.get('simulations') #no. of Monte Carlo simulation paths
+    K = data.get('K') #strike price of option
+    option_type = data.get('option_type') #type of option (i.e. 'call'/'put')
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    #validate all required parameters are present
+    if not all([IS, ER, sigma, T, timesteps, simulations, K, option_type]):
+        print("Tanuj##")
+        return jsonify({"error": "Missing required parameters"}, 400)
+
+    #call Monte Carlo pricing function with extracted parameters
+    print("Tanuj 1")
+    price = price_option(IS, ER, sigma, T, timesteps, simulations, K, option_type)
+
+    return jsonify({"option_price": price}, 200) #return calculated option price as a JSON response with status 200 (OK)
+
 
 @routes.route('/register', methods=['GET','POST'])
 def register():
