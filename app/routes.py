@@ -6,48 +6,13 @@ from werkzeug.security import generate_password_hash, check_password_hash #impor
 from trading import match_orders #import trading logic for order matching
 from forms_1 import RegistrationForm, LoginForm #import form handling for user registration and login
 from flask_login import login_user, logout_user, login_required, current_user #import flask_login for user sessions management
-from app.monte_carlo.monte_carlo import monte_carlo_greeks 
+from app.monte_carlo.monte_carlo import monte_carlo_greeks, monte_carlo_price
 import yfinance as yf #import Yahoo Finance API for retrieving financial data
 from datetime import datetime #import datetime for handling time-based operations
 from sqlalchemy import or_ #import SQLAlchemy ORM for database operations
 
 #----- Create a Blueprint for modularity -----
 routes = Blueprint('routes', __name__) #allows structuring the app into reusuable components
-
-#----- API Route definition for Option Pricing -----
-@routes.route('/option_pricing', methods=['GET', 'POST']) #define a GET/POST API endpoint
-def calculate_option_price():
-    try:
-        return render_template('option_pricing.html')
-    except Exception as e: #handle any unexpected errors and return an error message with status 500 (Internal Server Error)
-        return jsonify({"error": str(e)}, 500)
-
-
-#provides an API for users to compute Greeks
-@routes.route('/option_price_calculate', methods=['GET', 'POST'])
-def option_price_calculate():
-    data = request.json
-    print(data)
-    IS = data.get('IS') #initial stock price
-    ER = data.get('ER') #expected return
-    sigma = data.get('sigma') #volatility of stock
-    T = data.get('T') #time to maturity (in years)
-    timesteps = data.get('timesteps') #no. of timesteps in simulation
-    simulations = data.get('simulations') #no. of Monte Carlo simulation paths
-    K = data.get('K') #strike price of option
-    option_type = data.get('option_type') #type of option (i.e. 'call'/'put')
-
-    #validate all required parameters are present
-    if not all([IS, ER, sigma, T, timesteps, simulations, K, option_type]):
-        print("Tanuj##")
-        return jsonify({"error": "Missing required parameters"}, 400)
-
-    #call Monte Carlo pricing function with extracted parameters
-    print("Tanuj 1")
-    price = price_option(IS, ER, sigma, T, timesteps, simulations, K, option_type)
-
-    return jsonify({"option_price": price}, 200) #return calculated option price as a JSON response with status 200 (OK)
-
 
 @routes.route('/register', methods=['GET','POST'])
 def register():
@@ -164,17 +129,19 @@ def calculate_mc_greeks():
 def calculate_mc_greeks_calc():
 
     data = request.json
-    S = float(data['S'])  # Stock price
+    IS = float(data['IS'])  # Stock price
     K = float(data['K'])  # Strike price
     T = float(data['T'])  # Time to expiry in years
     r = float(data['r'])  # Risk-free rate
     sigma = float(data['sigma'])  # Volatility
     option_type = data['option_type']  # "call" or "put"
 
-    greeks = monte_carlo_greeks(S=S, K=K, T=T, r=r, sigma=sigma, option_type=option_type)
+    greeks = monte_carlo_greeks(IS=IS, K=K, T=T, r=r, sigma=sigma, option_type=option_type)
+    price = monte_carlo_price(IS, K, T, r, sigma, option_type)
 
     greeks=jsonify({
             "greeks": greeks, 
+            "option_price": price
             })
     return greeks
 

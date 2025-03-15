@@ -23,8 +23,8 @@
         <h1>Monte Carlo Option Greeks</h1>
         <form id="mc-greeks-form">
             <div class="mb-3">
-                <label for="S" class="form-label">Stock Price (S)</label>
-                <input type="number" id="S" class="form-control">
+                <label for="IS" class="form-label">Initial Stock Price (IS)</label>
+                <input type="number" id="IS" class="form-control">
             </div>
             <div class="mb-3">
                 <label for="K" class="form-label">Strike Price (K)</label>
@@ -53,31 +53,64 @@
         </form>
         
         <h3 class="mt-4">Results</h3>
-        <pre id="results"></pre>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Greek</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Delta</td><td id="delta">--</td></tr>
+                <tr><td>Gamma</td><td id="gamma">--</td></tr>
+                <tr><td>Rho</td><td id="rho">--</td></tr>
+                <tr><td>Theta</td><td id="theta">--</td></tr>
+                <tr><td>Vega</td><td id="vega">--</td></tr>
+            </tbody>
+        </table>
+        
+        <h4><strong>Option Price:</strong> <span class="text-success" id="option-price">--</span></h4>
+        
+        <button id="calculate-button" class="btn btn-primary">Calculate</button>
     </div>
 
     <script>
         function calculateMCGreeks() {
-            let data = {
-                S: document.getElementById("S").value,
-                K: document.getElementById("K").value,
-                T: document.getElementById("T").value,
-                r: document.getElementById("r").value,
-                sigma: document.getElementById("sigma").value,
-                option_type: document.getElementById("option-type").value
-            };
+            document.getElementById("calculate-button").addEventListener("click", function() {
+            // Get user inputs
+            let stockPrice = document.getElementById("stock-price").value;
+            let strikePrice = document.getElementById("strike-price").value;
+            let timeToExpiry = document.getElementById("time-to-expiry").value;
+            let riskFreeRate = document.getElementById("risk-free-rate").value;
+            let volatility = document.getElementById("volatility").value;
+            let optionType = document.getElementById("option-type").value;
 
-            fetch('/mc_greeks_calc', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+            // Send request to backend API
+            fetch("/api/get_option_results", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    stock_price: stockPrice,
+                    strike_price: strikePrice,
+                    time_to_expiry: timeToExpiry,
+                    risk_free_rate: riskFreeRate,
+                    volatility: volatility,
+                    option_type: optionType
+                })
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("results").innerText = JSON.stringify(data, null, 2);
+                // Update the results dynamically
+                document.getElementById("delta").innerText = data.greeks.Delta.toFixed(2);
+                document.getElementById("gamma").innerText = data.greeks.Gamma.toFixed(2);
+                document.getElementById("rho").innerText = data.greeks.Rho.toFixed(2);
+                document.getElementById("theta").innerText = data.greeks.Theta.toFixed(2);
+                document.getElementById("vega").innerText = data.greeks.Vega.toFixed(2);
+                document.getElementById("option-price").innerText = data.option_price.toFixed(2);
             })
-            .catch(error => console.error('Error:', error));
-        }
+            .catch(error => console.error("Error fetching option results:", error));
+        });
+    }
     </script>
 </body>
 </html>
