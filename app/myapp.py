@@ -8,7 +8,7 @@ migrate = Migrate() #initialise flask-migrate
 
 def create_app():
     #application factory function to create and configure a flask app instance
-    app = Flask(__name__) #create the Flask app instance
+    app = Flask(__name__, static_folder='static') #create the Flask app instance
     app.config.from_object('config.Config')  # Load app configurations
 
     #initialise extensions

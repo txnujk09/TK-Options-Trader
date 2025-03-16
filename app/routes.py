@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash #import Flask modules for web app functionality 
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash, send_from_directory #import Flask modules for web app functionality 
 from models import db, User, Order, Trade, Portfolio #import database models 
 from auth import register_user, login_user #import authentication functions
 from app.monte_carlo.option_pricing import price_option #import option pricing function
@@ -12,7 +12,7 @@ from datetime import datetime #import datetime for handling time-based operation
 from sqlalchemy import or_ #import SQLAlchemy ORM for database operations
 
 #----- Create a Blueprint for modularity -----
-routes = Blueprint('routes', __name__) #allows structuring the app into reusuable components
+routes = Blueprint('routes', __name__, static_folder='static') #allows structuring the app into reusuable components
 
 @routes.route('/register', methods=['GET','POST'])
 def register():
@@ -79,6 +79,7 @@ def run_order_matching():
 
 @routes.route('/')
 def home():
+    print("Static Folder Path:", routes.static_folder)
     if current_user.is_authenticated:
         print("Current user authenticated")
         return render_template('index.html')
@@ -129,15 +130,15 @@ def calculate_mc_greeks():
 def calculate_mc_greeks_calc():
 
     data = request.json
-    IS = float(data['IS'])  # Stock price
+    initial_stock_price = float(data['initial_stock_price'])  # Stock price
     K = float(data['K'])  # Strike price
     T = float(data['T'])  # Time to expiry in years
     r = float(data['r'])  # Risk-free rate
     sigma = float(data['sigma'])  # Volatility
     option_type = data['option_type']  # "call" or "put"
 
-    greeks = monte_carlo_greeks(IS=IS, K=K, T=T, r=r, sigma=sigma, option_type=option_type)
-    price = monte_carlo_price(IS, K, T, r, sigma, option_type)
+    greeks = monte_carlo_greeks(initial_stock_price=initial_stock_price, K=K, T=T, r=r, sigma=sigma, option_type=option_type)
+    price = monte_carlo_price(initial_stock_price, K, T, r, sigma, option_type)
 
     greeks=jsonify({
             "greeks": greeks, 
@@ -161,7 +162,7 @@ def get_options():
                 "calls": calls.to_dict(orient="records"),
                 "puts": puts.to_dict(orient="records")
             }
-            
+        
         return jsonify({
             "symbol": symbol,
             "expirations": expirations,
@@ -173,7 +174,7 @@ def get_options():
 @routes.route('/order_history', methods=['GET', 'POST'])
 def order_history():
     if not current_user.is_authenticated:
-        # User not authenticated, check what is best to return??
+        # User not authenticated, check what initial_stock_price best to return??
         return 'OK'
 
     orders = Order.query.filter(Order.user_id==current_user.id).all()
@@ -183,7 +184,7 @@ def order_history():
 @routes.route('/trade_history', methods=['GET', 'POST'])
 def trade_history():
     if not current_user.is_authenticated:
-        # User not authenticated, check what is best to return??
+        # User not authenticated, check what initial_stock_price best to return??
         return 'OK'
 
     trades = Trade.query.filter(or_(Trade.buyer_id==current_user.id,Trade.seller_id==current_user.id)).all()
@@ -192,3 +193,11 @@ def trade_history():
         trade.value = trade.quantity * trade.price
 
     return render_template('trade_history.html', trades=trades)
+
+@routes.route('/learn')
+def learn():
+    return render_template('learn.html')
+
+if __name__ == '__main__':
+    routes.run(debug=True)
+
