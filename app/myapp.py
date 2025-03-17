@@ -3,12 +3,11 @@ from flask_migrate import Migrate #imports for handling database migrations
 from models import db #import database instance from models
 from routes import routes #import routes blueprint for registering routes
 
-#db = SQLAlchemy()
 migrate = Migrate() #initialise flask-migrate
 
 def create_app():
     #application factory function to create and configure a flask app instance
-    app = Flask(__name__, static_folder='static') #create the Flask app instance
+    app = Flask(__name__, static_folder='static') #create the Flask app instance and specify the directory for static files
     app.config.from_object('config.Config')  # Load app configurations
 
     #initialise extensions
