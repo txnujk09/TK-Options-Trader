@@ -13,10 +13,11 @@ from app.models import db, Order
 
 def test_place_buy_order():
     app = create_app()
-    #app.config.from_object('config.TestConfig')
+    app.config.from_object('config.TestConfig')
 
     with app.app_context():
-        # Simulate placing a buy order
+        db.create_all()
+        #simulate placing a buy order
         new_order = Order(user_id=1, option_id=1, order_type="buy", quantity=10, price=100.0)
         db.session.add(new_order)
         db.session.commit()
