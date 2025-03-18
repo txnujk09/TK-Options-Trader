@@ -2,14 +2,12 @@ from models import db, Order, Trade, User, Portfolio
 from datetime import datetime
 
 def update_portfolio(stock:str, quantity:float, value:float, user_id:int, trade_type:str):
-    # Get stock for the user
-    #user_portfolios = Portfolio.query.filter(Portfolio.user_id==user_id).all()
     user_stock_details = db.session.query(Portfolio).filter_by(user_id=user_id, stock_name=stock).first()
     print("update_portfolio", user_stock_details)
     
     if user_stock_details:
         print("Upadting existing stock")
-        # If trade type is SELL reduce the quantity and holdings value
+        #if trade type is SELL reduce the quantity and holdings value
         if trade_type == 'SELL':
             user_stock_details.quantity = user_stock_details.quantity - quantity
             user_stock_details.value = user_stock_details.value - value
@@ -43,7 +41,6 @@ def update_user_available_balance(value:float, user_id:int, trade_type:str):
         # If trade type SELL increase the balance
         if trade_type == 'SELL':
             new_balance = user.balance + value
-        # If trade type SELL increase the balance
         else:
             new_balance = user.balance - value
 

@@ -74,8 +74,9 @@ if __name__ == "__main__":
     sys.exit(run_gbm_visual()) #calls the run_gbm_visual function which generates and visualises GBM simulations
 #sys.exit() ensures clean program termination after execution
 
-def monte_carlo_price(initial_stock_price, K, T, r, sigma, option_type, num_simulations=10000):
+def monte_carlo_price(initial_stock_price, K, T, r, sigma, option_type, num_simulations=50000):
     """Computes the option price using Monte Carlo simulation."""
+    np.random.seed(42)  # Fix seed for reproducibility
     Z = np.random.standard_normal(num_simulations) #generates standard normal random numbers
     S_T = initial_stock_price * np.exp((r - 0.5 * sigma**2) * T + sigma * np.sqrt(T) * Z) #simulates the future stock price using the GBM
     if option_type == "call": #checks if the option initial_stock_price a call option
@@ -84,7 +85,7 @@ def monte_carlo_price(initial_stock_price, K, T, r, sigma, option_type, num_simu
         payoffs = np.maximum(K - S_T, 0) #calculates the payoff for a European put option at expiration
     return np.exp(-r * T) * np.mean(payoffs) #discounts the expected payoff for option price
 
-def monte_carlo_greeks(initial_stock_price, K, T, r, sigma, option_type, num_simulations=10000, epsilon=1e-4):
+def monte_carlo_greeks(initial_stock_price, K, T, r, sigma, option_type, num_simulations=50000, epsilon=1e-2):
     """
     Computes option Greeks using the Monte Carlo method.
 
@@ -103,29 +104,29 @@ def monte_carlo_greeks(initial_stock_price, K, T, r, sigma, option_type, num_sim
     """
 
     # Base option price
-    base_price = monte_carlo_price(initial_stock_price, K, T, r, sigma, option_type) #calls the monte_carlo_price function which computes the option price
+    base_price = monte_carlo_price(initial_stock_price, K, T, r, sigma, option_type, num_simulations) #calls the monte_carlo_price function which computes the option price
 
     # Delta (∂C/∂S): Sensitivity to stock price
-    delta_price_up = monte_carlo_price(initial_stock_price + epsilon, K, T, r, sigma, option_type) #recalculates option price with slightly higher stock price
-    delta_price_down = monte_carlo_price(initial_stock_price - epsilon, K, T, r, sigma, option_type) #recalculates option price with slightly lower stock price
+    delta_price_up = monte_carlo_price(initial_stock_price + epsilon, K, T, r, sigma, option_type, num_simulations) #recalculates option price with slightly higher stock £
+    delta_price_down = monte_carlo_price(initial_stock_price - epsilon, K, T, r, sigma, option_type, num_simulations) #recalculates option price with slightly lower stock £
     delta = (delta_price_up - delta_price_down) / (2 * epsilon) #computes the gradient of the option price with respect to the stock price
 
     # Gamma (∂²C/∂S²): Sensitivity of Delta
     gamma = (delta_price_up - 2 * base_price + delta_price_down) / (epsilon ** 2) #calculated using the second-order finite difference approximation
 
     # Vega (∂C/∂σ): Sensitivity to volatility
-    vega_price_up = monte_carlo_price(initial_stock_price, K, T, r, sigma + epsilon, option_type) #recalculates the option price with higher volatility
-    vega_price_down = monte_carlo_price(initial_stock_price, K, T, r, sigma - epsilon, option_type) #recalculates the option price with lower volatility
+    vega_price_up = monte_carlo_price(initial_stock_price, K, T, r, sigma + epsilon, option_type, num_simulations) #recalculates the option price with higher volatility
+    vega_price_down = monte_carlo_price(initial_stock_price, K, T, r, sigma - epsilon, option_type, num_simulations) #recalculates the option price with lower volatility
     vega = (vega_price_up - vega_price_down) / (2 * epsilon) #computes the gradient of the option price with respect to the volatility of the underlying asset
 
     # Theta (∂C/∂T): Sensitivity to time
-    theta_price_up = monte_carlo_price(initial_stock_price, K, T + epsilon, r, sigma, option_type) #recalculates the option price with more time remaining
-    theta_price_down = monte_carlo_price(initial_stock_price, K, T - epsilon, r, sigma, option_type) #recalculates the option price with less time remaining
+    theta_price_up = monte_carlo_price(initial_stock_price, K, T + epsilon, r, sigma, option_type, num_simulations) #recalculates the option price with more time remaining
+    theta_price_down = monte_carlo_price(initial_stock_price, K, T - epsilon, r, sigma, option_type, num_simulations) #recalculates the option price with less time remaining
     theta = (theta_price_down - theta_price_up) / (2 * epsilon) #computes the rate of decay in option value
 
     # Rho (∂C/∂r): Sensitivity to interest rate
-    rho_price_up = monte_carlo_price(initial_stock_price, K, T, r + epsilon, sigma, option_type) #recalculates the option price with a higher risk-free rate
-    rho_price_down = monte_carlo_price(initial_stock_price, K, T, r - epsilon, sigma, option_type) #recalculates the option price with a lower risk-free rate
+    rho_price_up = monte_carlo_price(initial_stock_price, K, T, r + epsilon, sigma, option_type, num_simulations) #recalculates the option price with a higher risk-free rate
+    rho_price_down = monte_carlo_price(initial_stock_price, K, T, r - epsilon, sigma, option_type, num_simulations) #recalculates the option price with a lower risk-free rate
     rho = (rho_price_up - rho_price_down) / (2 * epsilon) #computes the sensitivity to interest rate
 
     #returns the computed Greeks in a dictionary format
@@ -137,16 +138,3 @@ def monte_carlo_greeks(initial_stock_price, K, T, r, sigma, option_type, num_sim
         "Rho": rho
     }
 
-# Example usage with dummy values
-greeks = monte_carlo_greeks(initial_stock_price=100, K=105, T=1, r=0.05, sigma=0.2, option_type="call")
-"""
-Sample values:
-initial_stock_price=100: Stock price initial_stock_price $100
-K=105: Strike price initial_stock_price $105
-T=1: One year to expiration
-r=0.05: Risk-free interest rate initial_stock_price 5%
-sigma=0.2: 20% volatility
-option_type="call": pricing a call option
-
-"""
-print(greeks) #print the computed Greeks
