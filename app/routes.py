@@ -21,7 +21,7 @@ def register():
         new_user = User(username=form.username.data) #create a new user with the provided username
         new_user.set_password(form.password.data) #set the user's password
         new_user.set_email(form.email.data) #set the user's email
-        new_user.balance = 10000 #initialise the user's balance
+        new_user.balance = 10000 #initialise the user's balance to 10000
         db.session.add(new_user) #add the new user to the database session
         db.session.commit() #commit the session to save the user to the database
         flash('Registration successful! You can now start hustling', 'success') #flash a success message

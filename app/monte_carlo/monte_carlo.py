@@ -90,7 +90,7 @@ def monte_carlo_greeks(initial_stock_price, K, T, r, sigma, option_type, num_sim
     Computes option Greeks using the Monte Carlo method.
 
     Parameters:
-    initial_stock_price (float)          : Current stock price
+    initial_stock_price (float): Current stock price
     K (float)          : Strike price
     T (float)          : Time to maturity (years)
     r (float)          : Risk-free interest rate
