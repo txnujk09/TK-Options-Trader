@@ -5,12 +5,12 @@
     <title>Portfolio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Shift 'Home' slightly to the right */
+        /*shift 'Home' slightly to the right */
         .navbar-brand {
             margin-left: 10px;
         }
 
-        /* Center align Portfolio, Trade, Options Calculator, Learn */
+        /*center align Portfolio, Trade, Options Calculator, Learn */
         .navbar-nav.center-nav {
             margin: auto;
             text-align: center;
@@ -26,7 +26,7 @@
             right: 20px;
         }
 
-        /* Dropdown styling */
+        /*dropdown styling */
         .dropdown-menu {
             display: none;
             position: absolute;
@@ -41,7 +41,7 @@
             display: block;
         }
 
-        /* Center content */
+        /*center content */
         .center-text {
             text-align: center;
             margin-top: 40px;
@@ -49,7 +49,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
         <a class="navbar-brand" href="/">Home</a>
         
         <!-- Centered Nav Links -->
@@ -62,7 +62,7 @@
             </ul>
         </div>
 
-        <!-- History Dropdown -->
+        <!-- History dropdown -->
         <div class="dropdown history-dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="historyDropdown">History</a>
             <ul class="dropdown-menu" aria-labelledby="historyDropdown">
@@ -73,28 +73,28 @@
     </nav>
 
     <div class="container mt-5">
-        <!-- Centering the portfolio title and available funds -->
+        <!--centering the portfolio title and available funds -->
         <div class="center-text">
             <h1>Options Portfolio</h1>
-            <h3>Available funds: {{ available_funds }}</h3>
+            <h3>Available funds: {{ available_funds }}</h3> <!--display available funds -->
         </div>
 
-        <table class="table table-striped mt-4">
+        <table class="table table-striped mt-4"> 
             <thead>
                 <tr>
-                    <th>Stock</th>
-                    <th>Quantity</th>
+                    <th>Stock</th> <!--table headers -->
+                    <th>Quantity</th> 
                     <th>Value</th>
                 </tr>
             </thead>
             <tbody>
-                {% for stock in stocks %}
+                {% for stock in stocks %} <!--loop through each stock in the portfolio -->
                     <tr>
-                        <td>{{ stock.stock_name }}</td>
-                        <td>{{ stock.quantity }}</td>
-                        <td>${{ stock.value }}</td>
+                        <td>{{ stock.stock_name }}</td> <!--display stock name, quantity, and value -->
+                        <td>{{ stock.quantity }}</td> 
+                        <td>${{ stock.value }}</td> 
                     </tr>
-                {% endfor %}
+                {% endfor %} <!--end loop -->
             </tbody>
         </table>
     </div>

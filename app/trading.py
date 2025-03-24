@@ -1,35 +1,35 @@
 from models import db, Order, Trade, User, Portfolio
 from datetime import datetime
 
-def update_portfolio(stock:str, quantity:float, value:float, user_id:int, trade_type:str):
-    user_stock_details = db.session.query(Portfolio).filter_by(user_id=user_id, stock_name=stock).first()
+def update_portfolio(stock:str, quantity:float, value:float, user_id:int, trade_type:str): #update the user's portfolio with the new trade
+    user_stock_details = db.session.query(Portfolio).filter_by(user_id=user_id, stock_name=stock).first() #get the user's stock details
     print("update_portfolio", user_stock_details)
     
     if user_stock_details:
         print("Upadting existing stock")
         #if trade type is SELL reduce the quantity and holdings value
         if trade_type == 'SELL':
-            user_stock_details.quantity = user_stock_details.quantity - quantity
-            user_stock_details.value = user_stock_details.value - value
+            user_stock_details.quantity = user_stock_details.quantity - quantity #reduce the quantity
+            user_stock_details.value = user_stock_details.value - value #reduce the value
             
         else: # Buy increase quantity and value
-            user_stock_details.quantity = user_stock_details.quantity + quantity
-            user_stock_details.value = user_stock_details.value + value
+            user_stock_details.quantity = user_stock_details.quantity + quantity #increase the quantity
+            user_stock_details.value = user_stock_details.value + value #increase the value
 
         updated_stock_value = user_stock_details.value
-        db.session.commit()  
+        db.session.commit()   #commit the transaction
     else:
         print("Adding new stock")
         portfolio = Portfolio()
         portfolio.user_id = user_id
-        portfolio.stock_name = stock
+        portfolio.stock_name = stock 
         portfolio.quantity =  -quantity if trade_type == 'SELL' else quantity
         portfolio.value = -value if trade_type == 'SELL' else value
         updated_stock_value = portfolio.value
         db.session.add(portfolio)
         db.session.commit()
 
-    update_user_available_balance(updated_stock_value, user_id, trade_type)
+    update_user_available_balance(updated_stock_value, user_id, trade_type) #update the user's available balance
             
 
 def update_user_available_balance(value:float, user_id:int, trade_type:str):
@@ -40,9 +40,9 @@ def update_user_available_balance(value:float, user_id:int, trade_type:str):
     if user:
         # If trade type SELL increase the balance
         if trade_type == 'SELL':
-            new_balance = user.balance + value
+            new_balance = user.balance + value #increase the balance
         else:
-            new_balance = user.balance - value
+            new_balance = user.balance - value #reduce the balance
 
         user.balance = new_balance
 

@@ -1,6 +1,6 @@
 #creating and intialising database
 
-# Adding project root to sys.path for module resolution
+#Adding project root to sys.path for module resolution
 import sys
 import os
 
@@ -11,8 +11,8 @@ print(sys.path)
 from app.myapp import create_app #Import create_app function from app 
 from app.models import db  #Import the database instance
 
-# Create the Flask app context
+#Create the Flask app context
 app = create_app()
 
 with app.app_context():
-    print("Database created successfully!")
+    print("Database created successfully!") #print message to indicate successful creation of database

@@ -1,22 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html> 
+<html lang="en"> <!--language of the page -->
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Home</title> <!--title of the page -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- Bootstrap CSS -->
     <style>
-        /* Center the welcome message vertically and horizontally */
+        /* Center content */
         .center-content {
-            text-align: center; /* Ensures all content inside is centered */
+            text-align: center; /* Ensures all content inside is in the centre */
             margin-top: 50px;
         }
 
         /* Shift 'Home' slightly to the right */
         .navbar-brand {
-            margin-left: 10px; /* Adjust as necessary */
+            margin-left: 10px; 
         }
 
-        /* Center align Portfolio, Trade, Options Calculator, Learn */
+        /* Align Portfolio, Trade, Options Calculator, Learn in the centre */
         .navbar-nav.center-nav {
             margin: auto;
             text-align: center;
@@ -57,33 +57,33 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">Home</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light"> <!-- Navbar -->
+        <a class="navbar-brand" href="/">Home</a> <!--home Link -->
         
         <!-- Centered Nav Links -->
         <div class="collapse navbar-collapse justify-content-center">
             <ul class="navbar-nav center-nav">
-                <li class="nav-item"><a class="nav-link" href="/portfolio">Portfolio</a></li>
-                <li class="nav-item"><a class="nav-link" href="/trade">Trade</a></li>
-                <li class="nav-item"><a class="nav-link" href="/mc_greeks">Options Calculator</a></li>
-                <li class="nav-item"><a class="nav-link" href="/learn">Learn</a></li>
+                <li class="nav-item"><a class="nav-link" href="/portfolio">Portfolio</a></li> <!--portfolio Link -->
+                <li class="nav-item"><a class="nav-link" href="/trade">Trade</a></li> <!--trade Link -->
+                <li class="nav-item"><a class="nav-link" href="/mc_greeks">Options Calculator</a></li> <!--mc_greeks Link -->
+                <li class="nav-item"><a class="nav-link" href="/learn">Learn</a></li> <!--learn Link -->
             </ul>
         </div>
 
         <!-- History Dropdown -->
         <div class="dropdown history-dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="historyDropdown">History</a>
-            <ul class="dropdown-menu" aria-labelledby="historyDropdown">
-                <li><a class="dropdown-item" href="/order_history">Order History</a></li>
-                <li><a class="dropdown-item" href="/trade_history">Trade History</a></li>
+            <ul class="dropdown-menu" aria-labelledby="historyDropdown"> <!--dropdown menu -->
+                <li><a class="dropdown-item" href="/order_history">Order History</a></li> <!--order_history Link -->
+                <li><a class="dropdown-item" href="/trade_history">Trade History</a></li> <!--trade_history Link -->
             </ul>
         </div>
     </nav>
 
-    <div class="center-content">
+    <div class="center-content"> <!-- Center content -->
         <h1>Welcome to TK Options Trader</h1>
         <p>Use the navigation bar to place trades, view your portfolio, and use the options calculator.</p>
-        <img class="center-content" src="{{ url_for('static', filename='images/home.png') }}" alt="Home Image">
+        <img class="center-content" src="{{ url_for('static', filename='images/home.png') }}" alt="Home Image"> <!--home Image -->
     </div>
     
 </body>

@@ -10,7 +10,7 @@
             margin-left: 10px;
         }
 
-        /* Center align Portfolio, Trade, Options Calculator, Learn */
+        /*center align Portfolio, Trade, Options Calculator, Learn */
         .navbar-nav.center-nav {
             margin: auto;
             text-align: center;
@@ -20,13 +20,13 @@
             transform: translateX(-45px);
         }
 
-        /* Position History on the right */
+        /*position History on the right */
         .history-dropdown {
             position: absolute;
             right: 20px;
         }
 
-        /* Dropdown styling */
+        /*dropdown styling */
         .dropdown-menu {
             display: none;
             position: absolute;
@@ -44,7 +44,7 @@
         /* Center content */
         .center-text {
             text-align: center;
-            margin-top: 40px; /* Adjust spacing */
+            margin-top: 40px; 
         }
     </style>
 </head>
@@ -52,12 +52,12 @@
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">Home</a>
+        <a class="navbar-brand" href="/">Home</a> <!--home link -->
 
         <!-- Centered Nav Links -->
         <div class="collapse navbar-collapse justify-content-center">
-            <ul class="navbar-nav center-nav">
-                <li class="nav-item"><a class="nav-link" href="/portfolio">Portfolio</a></li>
+            <ul class="navbar-nav center-nav"> <!--centered nav links -->
+                <li class="nav-item"><a class="nav-link" href="/portfolio">Portfolio</a></li> <!--portfolio link -->
                 <li class="nav-item"><a class="nav-link" href="/trade">Trade</a></li>
                 <li class="nav-item"><a class="nav-link" href="/mc_greeks">Options Calculator</a></li>
                 <li class="nav-item"><a class="nav-link" href="/learn">Learn</a></li>
@@ -66,9 +66,9 @@
 
         <!-- History Dropdown -->
         <div class="dropdown history-dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="historyDropdown">History</a>
+            <a class="nav-link dropdown-toggle" href="#" id="historyDropdown">History</a> <!--history dropdown -->
             <ul class="dropdown-menu" aria-labelledby="historyDropdown">
-                <li><a class="dropdown-item" href="/order_history">Order History</a></li>
+                <li><a class="dropdown-item" href="/order_history">Order History</a></li> <!--order history link -->
                 <li><a class="dropdown-item" href="/trade_history">Trade History</a></li>
             </ul>
         </div>
@@ -77,13 +77,13 @@
     <div class="container mt-5">
         <h1 class="center-text">Monte Carlo Options Calculator</h1>
 
-        <div class="row mt-4 justify-content-around gap-3">
-            <!-- Left Column: Inputs -->
-            <div class="col-md-5">
+        <div class="row mt-4 justify-content-around gap-3"> <!--row with 2 columns -->
+            <!--left Column: Inputs -->
+            <div class="col-md-5"> <!--left column -->
                 <h3>Inputs</h3>
                 <form id="mc-greeks-form">
                     <div class="mb-3">
-                        <label for="IS" class="form-label">Initial Stock Price (IS)</label>
+                        <label for="IS" class="form-label">Initial Stock Price (IS)</label> <!--initial stock price input -->
                         <input type="number" id="IS" class="form-control">
                     </div>
                     <div class="mb-3">
@@ -104,7 +104,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="option_type" class="form-label">Option Type</label>
-                        <select id="option_type" class="form-control">
+                        <select id="option_type" class="form-control"> <!--option type dropdown -->
                             <option value="call">Call</option>
                             <option value="put">Put</option>
                         </select>
@@ -112,10 +112,10 @@
                 </form>
             </div>
 
-            <!-- Right Column: Option Greeks Results -->
-            <div class="col-md-5">
+            <!-- Right column: Option Greeks results -->
+            <div class="col-md-5"> <!--right column -->
                 <h3>Results</h3>
-                <table class="table table-striped">
+                <table class="table table-striped"> <!--table to display results -->
                     <thead>
                         <tr>
                             <th>Greek</th>
@@ -131,22 +131,22 @@
                     </tbody>
                 </table>
 
-                <!-- Calculate button -->
-                <button type="button" class="btn btn-primary mt-2" onclick="calculateMCGreeks()">Calculate</button>
+                <!--calculate button -->
+                <button type="button" class="btn btn-primary mt-2" onclick="calculateMCGreeks()">Calculate</button> 
 
-                <!-- Option Price Section -->
+                <!--option price section -->
                 <div class="mt-4">
-                    <h3><strong>Option Price:</strong> <span class="text-success" id="option_price">--</span></h3>
+                    <h3><strong>Option Price:</strong> <span class="text-success" id="option_price">--</span></h3> 
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript Logic -->
+    <!-- JavaScript logic -->
     <script>
         function calculateMCGreeks() {
-            // Get user inputs
-            let stockPrice = document.getElementById("IS").value;
+            //get user inputs
+            let stockPrice = document.getElementById("IS").value; //initial stock price
             let strikePrice = document.getElementById("K").value;
             console.log("strikePrice:", strikePrice)
             let timeToExpiry = document.getElementById("T").value;
@@ -155,15 +155,15 @@
             let optionType = document.getElementById("option_type").value;
 
             // Send request to backend API
-            console.log("tanuj from calculateMCGreeks()")
+            console.log("tanuj from calculateMCGreeks()") //debugging
             fetch("/mc_greeks_calc", {
-                method: "POST",
+                method: "POST", //send a POST request
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    initial_stock_price: stockPrice,
+                    initial_stock_price: stockPrice, //send user inputs to the backend
                     K: strikePrice,
                     T: timeToExpiry,
-                    r: riskFreeRate,
+                    r: riskFreeRate,    
                     sigma: volatility,
                     option_type: optionType
                 })
@@ -171,14 +171,14 @@
             .then(response => response.json())
             .then(data => {
                 // Update the results dynamically
-                document.getElementById("delta").innerText = data.greeks.Delta.toFixed(2);
+                document.getElementById("delta").innerText = data.greeks.Delta.toFixed(2); //update delta value
                 document.getElementById("gamma").innerText = data.greeks.Gamma.toFixed(2);
                 document.getElementById("rho").innerText = data.greeks.Rho.toFixed(2);
-                document.getElementById("theta").innerText = data.greeks.Theta.toFixed(2);
+                document.getElementById("theta").innerText = data.greeks.Theta.toFixed(2); 
                 document.getElementById("vega").innerText = data.greeks.Vega.toFixed(2);
                 document.getElementById("option_price").innerText = data.option_price.toFixed(2);
             })
-            .catch(error => console.error("Error fetching option results:", error));
+            .catch(error => console.error("Error fetching option results:", error)); //log any errors
         }
     </script>
 

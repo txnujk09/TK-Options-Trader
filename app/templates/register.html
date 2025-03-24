@@ -5,36 +5,36 @@
     <title>Register</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Center the form on the page */
+        /*center the form on the page */
         .center-content {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 80vh; /* Adjust height to center vertically */
+            height: 80vh; /*adjust height to center vertically */
             text-align: left;
         }
 
-        /* Adjust input box width */
+        /*adjust input box width */
         .input-box {
-            width: 350px; /* Increased size slightly */
-            height: 45px; /* Make it slightly taller */
-            font-size: 16px; /* Improve readability */
+            width: 350px; 
+            height: 45px; 
+            font-size: 16px; 
         }
 
-        /* Center login button */
+        /*center login button */
         .button-box {
             width: 300px;
         }
     </style>
 </head>
 <body>
-    <div class="container center-content">
+    <div class="container center-content"> <!--center the form -->
         <h2>Register</h2>
         <form method="POST">
-            {{ form.hidden_tag() }}
+            {{ form.hidden_tag() }} 
             <div class="mb-3">
-                {{ form.username.label }} {{ form.username(class="form-control input-box") }}
+                {{ form.username.label }} {{ form.username(class="form-control input-box") }} <!--username input box -->
             </div>
             <div class="mb-3">
                 {{ form.email.label }} {{ form.email(class="form-control input-box") }}
@@ -46,10 +46,10 @@
                 {{ form.confirm_password.label }} {{ form.confirm_password(class="form-control input-box") }}
             </div>
             <div class="mb-3">
-                {{ form.submit(class="btn btn-primary") }}
+                {{ form.submit(class="btn btn-primary") }} <!--submit button -->
             </div>
-        </form>
-        <p>Already have an account? <a href="{{ url_for('routes.login') }}">Login here</a></p>
+        </form> 
+        <p>Already have an account? <a href="{{ url_for('routes.login') }}">Login here</a></p> <!--link to login page -->
     </div>
 </body>
 </html>

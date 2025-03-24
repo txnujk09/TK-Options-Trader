@@ -5,17 +5,17 @@ def price_option(IS, ER, sigma, T, timesteps, simulations, K, option_type="call"
     """
     Price a European option using Monte Carlo simulation.
     """
-    paths = geometric_brownian_motion(IS, ER, sigma, T, timesteps, simulations)
-    S_T = paths[:, -1]
+    paths = geometric_brownian_motion(IS, ER, sigma, T, timesteps, simulations) #generate stock price paths
+    S_T = paths[:, -1] #get the stock price at maturity
 
     if option_type == "call":
-        payoffs = np.maximum(S_T - K, 0)
+        payoffs = np.maximum(S_T - K, 0) #calculate the payoff for a call option
     elif option_type == "put":
-        payoffs = np.maximum(K - S_T, 0)
+        payoffs = np.maximum(K - S_T, 0) #calculate the payoff for a put option
     else:
         raise ValueError("Invalid option type. Choose 'call' or 'put'.")
 
-    discounted_payoff = np.exp(-ER * T) * np.mean(payoffs)
+    discounted_payoff = np.exp(-ER * T) * np.mean(payoffs) #calculate the discounted payoff
     print(discounted_payoff)
     return discounted_payoff
 
@@ -32,8 +32,8 @@ def run_price_option():
     call_price = price_option(IS, ER, sigma, T, timesteps, simulations, K, option_type="call")
     put_price = price_option(IS, ER, sigma, T, timesteps, simulations, K, option_type="put")
 
-    print(f"Call Option Price: {call_price:.2f}")
-    print(f"Put Option Price: {put_price:.2f}")
+    print(f"Call Option Price: {call_price:.2f}") #print the call option price
+    print(f"Put Option Price: {put_price:.2f}") #print the put option price
 
-if __name__ == "__main__":
-    run_price_option()
+if __name__ == "__main__": 
+    run_price_option() #run the run_price_option function

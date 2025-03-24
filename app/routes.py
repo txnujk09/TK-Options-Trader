@@ -108,10 +108,6 @@ def portfolio():
     else:
         return render_template('portfolio.html', available_funds=available_funds) #render the portfolio template with only the available funds
 
-@routes.route('/market-trends')
-def market_trends():
-    return render_template('market_trends.html') #render the market trends page template
-
 @routes.route('/mc_greeks', methods=['GET', 'POST'])
 def calculate_mc_greeks():
     return render_template('mc_greeks.html') #render the Monte Carlo Greeks calculation page template
@@ -187,4 +183,3 @@ def learn():
 
 if __name__ == '__main__':
     routes.run(debug=True) #run the Flask app in debug mode
-

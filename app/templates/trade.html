@@ -11,7 +11,7 @@
             margin-left: 10px;
         }
 
-        /* Align Portfolio, Trade, Options Calculator, Learn in the center */
+        /*align Portfolio, Trade, Options Calculator, Learn in the center */
         .navbar-nav.center-nav {
             margin: auto;
             text-align: center;
@@ -27,7 +27,7 @@
             right: 20px;
         }
 
-        /* Dropdown styling */
+        /*Dropdown styling */
         .dropdown-menu {
             display: none;
             position: absolute;
@@ -42,7 +42,7 @@
             display: block;
         }
 
-        /* Center content */
+        /*Center content */
         .center-text {
             text-align: center;
             margin-top: 40px; /* Adjust spacing */
@@ -84,9 +84,9 @@
             </ul>
         </div>
 
-        <!-- History Dropdown -->
+        <!--history Dropdown -->
         <div class="dropdown history-dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="historyDropdown">History</a>
+            <a class="nav-link dropdown-toggle" href="#" id="historyDropdown">History</a> 
             <ul class="dropdown-menu" aria-labelledby="historyDropdown">
                 <li><a class="dropdown-item" href="/order_history">Order History</a></li>
                 <li><a class="dropdown-item" href="/trade_history">Trade History</a></li>
@@ -94,35 +94,15 @@
         </div>
     </nav>           
 
-    <!-- Center the title, input box, and button -->
+    <!--center the title, input box, and button -->
     <div class="container center-content">
         <h1>Yahoo Finance Options Chain</h1>
-        <label for="symbol" class="form-label mt-3">Enter ticker:</label>
+        <label for="symbol" class="form-label mt-3">Enter ticker:</label> <!--input box for user to enter stock symbol -->
         <input type="text" id="symbol" class="form-control input-box" placeholder="e.g. PLTR">
-        <button class="btn btn-primary button-box" onclick="fetchOptions()">Get Options</button>
+        <button class="btn btn-primary button-box" onclick="fetchOptions()">Get Options</button> <!--button to fetch options chain -->
     </div>
 
-    <div id="options_result" class="container mt-5"></div>
-
-    <!-- <script>
-        function fetchTradeData() {
-            let symbol = document.getElementById('symbol').value.trim().toUpperCase();
-            if (!symbol) {
-                alert("Please enter a stock symbol.");
-                return;
-            }
-
-            fetch(`/trade?symbol=${symbol}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('trade-result').innerHTML = `<p class="text-success">Trade executed for ${data.symbol} at price ${data.price}</p>`;
-                })
-                .catch(error => {
-                    console.error("Fetch error:", error);
-                    document.getElementById('trade-result').innerHTML = `<p class="container center-content text-danger">Error executing trade.</p>`;
-                });
-        }
-    </script> -->
+    <div id="options_result" class="container mt-5"></div> <!--display options chain -->
 
     <script>
         function onConfirmBuy(button) {
@@ -142,21 +122,21 @@
 
             // Convert to dictionary
             let rowDictionary = {};
-            table_headers.slice(0, 8).forEach((key, index) => {
-                console.log(key, index, row_values[index])
-                rowDictionary[key] = row_values[index];
+            table_headers.slice(0, 8).forEach((key, index) => { //slice to get only the first 8 columns
+                console.log(key, index, row_values[index]) //print key, index, and value
+                rowDictionary[key] = row_values[index]; //add key-value pair to dictionary
             });
 
-            rowDictionary['Trade_type'] = 'BUY'
+            rowDictionary['Trade_type'] = 'BUY' //add trade type to dictionary
             fetch('/place_order', {
-                method: 'POST',
+                method: 'POST', 
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json' //set content type to json
                 },
                 body: JSON.stringify(rowDictionary)
             })
             .then(response => response.json())
-            .then(data => console.log("Response from server:", data))
+            .then(data => console.log("Response from server:", data)) //log response from server
             .catch(error => console.error("Error:", error));
         }
     </script>
@@ -182,26 +162,26 @@
                 rowDictionary[key] = row_values[index];
             });
 
-            rowDictionary['Trade_type'] = 'SELL'
+            rowDictionary['Trade_type'] = 'SELL' //add trade type to dictionary
             fetch('/place_order', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json' 
                 },
                 body: JSON.stringify(rowDictionary)
             })
             .then(response => response.json())
-            .then(data => console.log("Response from server:", data))
+            .then(data => console.log("Response from server:", data)) //log response from server
             .catch(error => console.error("Error:", error));
         }
     </script>
 
     <script>
         function fetchOptions() {
-            let symbol = document.getElementById('symbol').value.trim().toUpperCase();
+            let symbol = document.getElementById('symbol').value.trim().toUpperCase(); //get stock symbol
             if (!symbol) {
                 alert("Please enter a stock symbol.");
-                return;
+                return; //return if no symbol is entered
             }
 
             fetch(`/options?symbol=${symbol}`)
@@ -219,7 +199,7 @@
                         console.log("Hello")
                         //console.log(chain)
 
-                        resultHTML += `<h5>Expiration: ${expiration}</h5>`;
+                        resultHTML += `<h5>Expiration: ${expiration}</h5>`; //display expiration date
                         resultHTML += `
                             <table class="table table-bordered" id="OptionsTable">
                                 <thead class="table-dark">
@@ -238,14 +218,14 @@
                                 </thead>
                                 <tbody>
                         `;
-
-                        if (chain && chain.calls) {
-                            if (chain.calls.length > 0) {
+ 
+                        if (chain && chain.calls) { //check if calls are available
+                            if (chain.calls.length > 0) { //display call options
                                 chain.calls.forEach(option => {
                                     resultHTML += `
                                         <tr>
                                             <td class="text-success">Call</td>
-                                            <td>${option.contractSymbol || 'N/A'}</td>
+                                            <td>${option.contractSymbol || 'N/A'}</td> 
                                             <td>${option.bid || 'N/A'}</td>
                                             <td>${option.ask || 'N/A'}</td>
                                             <td>${option.strike}</td>
@@ -259,15 +239,15 @@
                                 });
                             }
                         } else {
-                            resultHTML += `<tr><td colspan="7" class="text-center">No Call Options Available</td></tr>`;
+                            resultHTML += `<tr><td colspan="7" class="text-center">No Call Options Available</td></tr>`; //display if no call options are available
                         }
 
-                        if (chain && chain.puts && chain.puts.length > 0) {
-                            chain.puts.forEach(option => {
-                                resultHTML += `
+                        if (chain && chain.puts && chain.puts.length > 0) { //display put options
+                            chain.puts.forEach(option => { //loop through put options 
+                                resultHTML += ` 
                                     <tr>
-                                        <td class="text-danger">Put</td>
-                                        <td>${option.contractSymbol || 'N/A'}</td>
+                                        <td class="text-danger">Put</td> 
+                                        <td>${option.contractSymbol || 'N/A'}</td> 
                                         <td>${option.bid || 'N/A'}</td>
                                         <td>${option.ask || 'N/A'}</td>
                                         <td>${option.strike}</td>
@@ -285,10 +265,10 @@
 
                         resultHTML += `</tbody></table>`;
                     });
-                    console.log("Hello Tanuj")
-                    document.getElementById('options_result').innerHTML = resultHTML;
+                    console.log("Hello Tanuj") //print Hello Tanuj
+                    document.getElementById('options_result').innerHTML = resultHTML; //display options chain
                 })
-                .catch(error => {
+                .catch(error => { //catch error
                     console.error("Fetch error:", error);
                     //document.getElementById('options_result').innerHTML = `<p class="text-danger">Error fetching options data.</p>`;
                 });
